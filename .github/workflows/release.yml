@@ -1,0 +1,31 @@
+
+name: Build Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Checkout Plugin
+        uses: actions/checkout@v3
+        with:
+          repository: rechecked/rcagent-plugins
+          path: './plugins'
+
+      - name: Set Version and Plugin
+        run: sed -i 's/VERSION_ID/${{ github.ref_name }}/' rcagent/rcagent.inc.php
+        run: cp plugins/check_rcagent.py rcagent/plugins/check_rcagent.py
+        run: chmod +x rcagent/plugins/check_rcagent.py
+
+      - name: Archive Build
+        uses: actions/upload-artifact@v3
+        with:
+            name: rcagent
+            path: rcagent

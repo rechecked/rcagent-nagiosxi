@@ -1,0 +1,11 @@
+<configwizard>
+    <plugins>
+        <plugin filename="check_rcagent.py" />
+    </plugins>
+    <templates>
+        <template filename="rcagent.cfg" />
+    </templates>
+    <logos>
+        <logo filename="rcagent.png" />
+    </logos>
+</configwizard>
