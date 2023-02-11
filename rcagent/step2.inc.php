@@ -2,7 +2,7 @@
 include_once(dirname(__FILE__).'/utils.inc.php');
 
 // Get OS and other system data
-$system = rcagent_configwizard_get_api_data("system", $api_url, $rp_token, $ssl_verify);
+$system = rcagent_configwizard_get_api_data("system", $status_url, $rp_token, $ssl_verify);
 
 ?>
 <?php if (is_dev_mode()) { ?>
@@ -231,7 +231,7 @@ createApp({
     methods: {
         fetchData () {
             const params = new FormData();
-            params.append("api_url", "<?php echo encode_form_val($api_url); ?>");
+            params.append("status_url", "<?php echo encode_form_val($status_url); ?>");
             params.append("token", "<?php echo encode_form_val($rp_token); ?>");
             params.append("ssl_verify", "<?php echo encode_form_val($ssl_verify); ?>");
             params.append("os", "<?php echo encode_form_val($system['os']); ?>");

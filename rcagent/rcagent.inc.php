@@ -130,8 +130,8 @@ function rcagent_configwizard_func($mode = "", $inargs = null, &$outargs, &$resu
                 $proto = $no_https ? "http" : "https";
 
                 // Test connection
-                $query_url = "{$proto}://{$ip_address}:{$port}/api/system?token=".urlencode($token);
-                $query_url_replaced = "{$proto}://{$ip_address_replaced}:{$port_replaced}/api/system?token=".urlencode($token_replaced);
+                $query_url = "{$proto}://{$ip_address}:{$port}/status/system?token=".urlencode($token);
+                $query_url_replaced = "{$proto}://{$ip_address_replaced}:{$port_replaced}/status/system?token=".urlencode($token_replaced);
 
                 // Remove SSL verification or not
                 $context = array("ssl" => array("verify_peer" => false, "verify_peer_name" => false));
@@ -182,7 +182,7 @@ function rcagent_configwizard_func($mode = "", $inargs = null, &$outargs, &$resu
             }
 
             $COMPONENT_API_URL = get_base_url(true) . "includes/configwizards/rcagent/api.php";
-            $api_url = "https://{$rp_address}:{$rp_port}/api";
+            $status_url = "https://{$rp_address}:{$rp_port}/status";
 
             $output = '<input type="hidden" name="ip_address" value="' . encode_form_val($ip_address) . '">
                        <input type="hidden" name="port" value="' . encode_form_val($port) . '">

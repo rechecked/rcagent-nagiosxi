@@ -7,5 +7,10 @@
     </templates>
     <logos>
         <logo filename="rcagent.png" />
+        <logo filename="rc-centos.png" />
+        <logo filename="rc-debian.png" />
+        <logo filename="rc-macos.png" />
+        <logo filename="rc-ubuntu.png" />
+        <logo filename="rc-windows.png" />
     </logos>
 </configwizard>
