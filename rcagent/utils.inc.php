@@ -1,6 +1,6 @@
 <?php
 
-function rcagent_configwizard_get_api_data($endpoint, $status_url, $token, $ssl_verify, $params = array())
+function rcagent_configwizard_get_api_data($endpoint, $status_url, $token, $ssl_verify, $params = array(), $json = false)
 {
     // Remove SSL verification or not
     $context = array("ssl" => array("verify_peer" => false, "verify_peer_name" => false));
@@ -15,6 +15,10 @@ function rcagent_configwizard_get_api_data($endpoint, $status_url, $token, $ssl_
 
     // Do connection and get data
     $data = file_get_contents($full_status_url, false, stream_context_create($context));
+
+    if ($json) {
+        return $data;
+    }
     $data = json_decode($data, true);
 
     return $data;

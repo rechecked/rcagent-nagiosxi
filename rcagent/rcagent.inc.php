@@ -194,8 +194,8 @@ function rcagent_configwizard_func($mode = "", $inargs = null, &$outargs, &$resu
             if (empty($services)) {
                 $services['cpu'] = array(
                     'check' => 1,
-                    'warning' => 40,
-                    'critical' => 60
+                    'warning' => 70,
+                    'critical' => 90
                 );
                 $services['load'] = array(
                     'check' => 1,
@@ -209,8 +209,13 @@ function rcagent_configwizard_func($mode = "", $inargs = null, &$outargs, &$resu
                 );
                 $services['mem_swap'] = array(
                     'check' => 1,
-                    'warning' => 10,
-                    'critical' => 20
+                    'warning' => 40,
+                    'critical' => 60
+                );
+                $services['users'] = array(
+                    'check' => 1,
+                    'warning' => 6,
+                    'critical' => 10
                 );
             }
 
@@ -399,7 +404,21 @@ function rcagent_configwizard_func($mode = "", $inargs = null, &$outargs, &$resu
                             $objs[] = array(
                                 "type" => OBJECTTYPE_SERVICE,
                                 "host_name" => $hostname,
-                                "service_description" => "Load",
+                                "service_description" => "Current Load",
+                                "use" => "xiwizard_rcagent_service",
+                                "check_command" => "check_xi_rcagent!" . $pluginopts,
+                                "_xiwizard" => $wizard_name);
+                            break;
+
+                        case "users":
+                            if (!array_key_exists('check', $args)) { break; }
+
+                            $pluginopts .= "-e system/users $wcopts";
+
+                            $objs[] = array(
+                                "type" => OBJECTTYPE_SERVICE,
+                                "host_name" => $hostname,
+                                "service_description" => "Current Users",
                                 "use" => "xiwizard_rcagent_service",
                                 "check_command" => "check_xi_rcagent!" . $pluginopts,
                                 "_xiwizard" => $wizard_name);
@@ -433,15 +452,121 @@ function rcagent_configwizard_func($mode = "", $inargs = null, &$outargs, &$resu
                                 "_xiwizard" => $wizard_name);
                             break;
 
+                        case "disk":
+                            foreach ($args as $i => $disk) {
+                                if (!array_key_exists('check', $disk)) { continue; }
+
+                                $opts = "-q ".escapeshellarg("path=".$disk['path']);
+
+                                $pluginopts .= "-e disk $opts $wcopts";
+
+                                $objs[] = array(
+                                    "type" => OBJECTTYPE_SERVICE,
+                                    "host_name" => $hostname,
+                                    "service_description" => "Disk Usage - ".$disk['path'],
+                                    "use" => "xiwizard_rcagent_service",
+                                    "check_command" => "check_xi_rcagent!" . $pluginopts,
+                                    "_xiwizard" => $wizard_name);
+                            }
+                            break;
+
+                        case "inodes":
+                            foreach ($args as $i => $inodes) {
+                                if (!array_key_exists('check', $inodes)) { continue; }
+
+                                $opts = "-q ".escapeshellarg("path=".$inodes['path']);
+
+                                $pluginopts .= "-e disk/inodes $opts $wcopts";
+
+                                $objs[] = array(
+                                    "type" => OBJECTTYPE_SERVICE,
+                                    "host_name" => $hostname,
+                                    "service_description" => "Inode Usage - ".$inodes['path'],
+                                    "use" => "xiwizard_rcagent_service",
+                                    "check_command" => "check_xi_rcagent!" . $pluginopts,
+                                    "_xiwizard" => $wizard_name);
+                            }
+                            break;
+
+                        case "network":
+                            foreach ($args as $i => $net) {
+                                if (!array_key_exists('check', $net)) { continue; }
+
+                                $opts = "-u MB -q delta=1 -q ".escapeshellarg("name=".$net['name']);
+                                if (!empty($net['against'])) {
+                                    $opts .= " -q ".escapeshellarg("against=".$net['against']);
+                                }
+
+                                $pluginopts .= "-e network $opts $wcopts";
+
+                                $objs[] = array(
+                                    "type" => OBJECTTYPE_SERVICE,
+                                    "host_name" => $hostname,
+                                    "service_description" => "Network Interface - ".$net['name'],
+                                    "use" => "xiwizard_rcagent_service",
+                                    "check_command" => "check_xi_rcagent!" . $pluginopts,
+                                    "_xiwizard" => $wizard_name);
+                            }
+                            break;
+
+                        case "services":
+                            foreach ($args as $i => $service) {
+                                if (!array_key_exists('check', $service) || empty($service['desc'])) {
+                                    continue;
+                                }
+                                $opts = "{$pluginopts} -e services -q " . escapeshellarg("name=".$service['name']);
+                                $opts .= " -q " . escapeshellarg("expected=".$service['expected']);
+
+                                $description = str_replace(array('\\', ','), array('/', ' '), $service['desc']);
+
+                                $objs[] = array(
+                                    "type" => OBJECTTYPE_SERVICE,
+                                    "host_name" => $hostname,
+                                    "service_description" => $description,
+                                    "use" => "xiwizard_rcagent_service",
+                                    "check_command" => "check_xi_rcagent!" . $opts,
+                                    "_xiwizard" => $wizard_name);
+                            }
+                            break;
+
+                        case "processes":
+                            foreach ($args as $i => $proc) {
+                                if (!array_key_exists('check', $proc) || empty($proc['desc'])) {
+                                    continue;
+                                }
+                                
+                                $wcopts = "";
+                                if (!empty($args['warning'])) {
+                                    $wcopts .= " -w " . escapeshellarg($proc["warning"]);
+                                }
+                                if (!empty($args['critical'])) {
+                                    $wcopts .= " -c " . escapeshellarg($proc["critical"]);
+                                }
+
+                                $opts = "{$pluginopts} -e processes -q " . escapeshellarg("name=".$proc['name']);
+                                $opts .= " {$wcopts}";
+
+                                $description = str_replace(array('\\', ','), array('/', ' '), $proc['desc']);
+
+                                $objs[] = array(
+                                    "type" => OBJECTTYPE_SERVICE,
+                                    "host_name" => $hostname,
+                                    "service_description" => $description,
+                                    "use" => "xiwizard_rcagent_service",
+                                    "check_command" => "check_xi_rcagent!" . $opts,
+                                    "_xiwizard" => $wizard_name);
+                            }
+                            break;
+
                         case "plugins":
                             foreach ($args as $i => $plugin) {
                                 if (!array_key_exists('check', $plugin) || empty($plugin['desc'])) {
                                     continue;
                                 }
-                                $theseopts = "{$pluginopts} -p " . escapeshellarg($plugin['name']);
+                                $opts = "{$pluginopts} -p " . escapeshellarg($plugin['plugin']);
 
                                 if (!empty($plugin['args'])) {
-                                    $theseopts .= " --arg=" . escapeshellarg($plugin['args']);
+                                    $opts .= " --arg=" . escapeshellarg($plugin['args']);
                                 }
 
                                 $description = str_replace(array('\\', ','), array('/', ' '), $plugin['desc']);
@@ -451,7 +576,7 @@ function rcagent_configwizard_func($mode = "", $inargs = null, &$outargs, &$resu
                                     "host_name" => $hostname,
                                     "service_description" => $description,
                                     "use" => "xiwizard_rcagent_service",
-                                    "check_command" => "check_xi_rcagent!" . $theseopts,
+                                    "check_command" => "check_xi_rcagent!" . $opts,
                                     "_xiwizard" => $wizard_name);
                             }
                             break;
