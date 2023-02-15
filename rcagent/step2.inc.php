@@ -92,10 +92,10 @@ if (!array_key_exists('plugins', $services)) {
 }
 
 ?>
-<?php if (is_dev_mode()) { ?>
+<?php if (!is_dev_mode()) { ?>
 <script src="https://unpkg.com/vue@3.2.47/dist/vue.global.js"></script>
 <?php } else { ?>
-<script src="js/vue.global.js"></script>
+<script src="<?php echo get_base_url(true); ?>includes/configwizards/rcagent/js/vue.3.2.47.prod.js"></script>
 <?php } ?>
 
 <style type="text/css">
