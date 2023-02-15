@@ -92,7 +92,7 @@ if (!array_key_exists('plugins', $services)) {
 }
 
 ?>
-<?php if (!is_dev_mode()) { ?>
+<?php if (is_dev_mode()) { ?>
 <script src="https://unpkg.com/vue@3.2.47/dist/vue.global.js"></script>
 <?php } else { ?>
 <script src="<?php echo get_base_url(true); ?>includes/configwizards/rcagent/js/vue.3.2.47.prod.js"></script>
@@ -587,7 +587,7 @@ input[type=checkbox] { margin: 0; }
                             <h4 class="modal-title">Select Plugin</h4>
                           </div>
                           <div class="modal-body">
-                            <div v-if="pluginsAvailable.length > 0 ">
+                            <div v-if="pluginsAvailable && pluginsAvailable.length > 0">
                                 <select style="width: 100%;" v-model="selectedPlugin" class="form-control">
                                     <option v-for="p in pluginsAvailable" :value="p">{{ p }}</option>
                                 </select>
