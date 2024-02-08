@@ -21,8 +21,7 @@ jobs:
 
       - name: Set Version and Plugin
         run: |
-          VERSION=$(echo '${{ github.ref_name }}' | grep "[[:digit:]].*" -o)
-          sed -i 's/VERSION_ID/$VERSION/' rcagent/rcagent.inc.php
+          sed -i 's/VERSION_ID/'$(echo '${{ github.ref_name }}' | grep "[[:digit:]].*" -o)'/' rcagent/rcagent.inc.php
           cp plugins/check_rcagent.py rcagent/plugins/check_rcagent.py
           chmod +x rcagent/plugins/check_rcagent.py
 
