@@ -1,7 +1,7 @@
 <?php
 //
 // ReChecked Agent Config Wizard
-// Copyright (c) 2023 ReChecked. All rights reserved.
+// Copyright (c) 2023-2024 ReChecked. All rights reserved.
 //
 
 include_once(dirname(__FILE__).'/utils.inc.php');
@@ -22,7 +22,7 @@ function rcagent_configwizard_init()
         CONFIGWIZARD_NAME => $name,
         CONFIGWIZARD_VERSION => "VERSION_ID",
         CONFIGWIZARD_TYPE => CONFIGWIZARD_TYPE_MONITORING,
-        CONFIGWIZARD_DESCRIPTION => _("Monitor a host (Windows, Linux, OS X, Solaris, or AIX) using the ReChecked Agent.") . ' <div class="hide">centos rhel sles suse opensuse oracle cloudlinux ubuntu debian redhat mac</div>',
+        CONFIGWIZARD_DESCRIPTION => _("Monitor a host (Windows, Linux, OS X, Solaris, AIX, and more) using the ReChecked Agent.") . ' <div class="hide">centos rhel sles suse opensuse oracle cloudlinux ubuntu debian redhat mac rcagent</div>',
         CONFIGWIZARD_DISPLAYTITLE => _("ReChecked Agent"),
         CONFIGWIZARD_FUNCTION => "rcagent_configwizard_func",
         CONFIGWIZARD_PREVIEWIMAGE => "rcagent.png",
@@ -56,7 +56,7 @@ function rcagent_configwizard_func($mode = "", $inargs = null, &$outargs, &$resu
             $output = '
             <h5 class="ul">' . _('Connection Info') . '</h5>
 
-            <p>'._('This wizard requires a running rcagent, if you don\'t have ReChecked Agent isntalled yet follow the').' <a href="https://rechecked.io/quick-start-guide/" target="_blank" rel="noreferrer noopener">'._('quick start guide').'</a> '._('to get started.').'</p>
+            <p>'._('This wizard requires a running ReChecked Agent (rcagent), if you don\'t have ReChecked Agent isntalled yet follow the').' <a href="https://rechecked.io/docs/rcagent/getting-started/installation/" target="_blank" rel="noreferrer noopener">'._('quick start guide').'</a> '._('to get started.').'</p>
 
             <table class="table table-condensed table-no-border table-auto-width table-padded">
                 <tr>
@@ -95,7 +95,7 @@ function rcagent_configwizard_func($mode = "", $inargs = null, &$outargs, &$resu
                     <td class="checkbox">
                         <label>
                             <input type="checkbox" name="ssl_verify" value="1" ' . is_checked($ssl_verify, 1) . '>
-                            ' . _("Verify SSL certificate") . '
+                            ' . _("Verify SSL certificate (if using ReChecked Manager)") . '
                         </label>
                     </td>
                 </tr>
